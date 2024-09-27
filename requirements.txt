@@ -16,3 +16,4 @@ toml==0.10.2
 torch==2.4.1
 tqdm==4.66.5
 transformers==4.45.1
+portaudio19-dev
