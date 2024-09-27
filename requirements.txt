@@ -6,7 +6,7 @@ pillow==10.4.0
 protobuf==5.28.2
 pyarrow==17.0.0
 pydeck==0.9.1
-pydub==0.25.1
+pydub
 pywin32==305.1
 PyYAML==6.0.2
 safetensors==0.4.5
