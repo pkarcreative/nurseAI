@@ -1,2 +1,2 @@
 #!/bin/bash
-streamlit run your_app.py --server.port $PORT --server.enableCORS false
+streamlit run nurseAI_emotion_detection_app.py --server.port $PORT --server.enableCORS false
