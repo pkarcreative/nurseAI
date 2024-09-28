@@ -1,2 +1,4 @@
 #!/bin/bash
-streamlit run nurseAI_emotion_detection_app.py --server.port $PORT --server.enableCORS false
+apt-get update
+apt-get install -y portaudio19-dev
+
