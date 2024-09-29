@@ -76,7 +76,7 @@ with col2:
     st.header("Voice Emotion Detection")
 
     # Option to upload an audio file or record audio
-    audio_input_type = st.radio("Choose input method:", ("Upload Audio", "Record Audio"))
+    audio_input_type = st.radio("Choose input method:", ("Upload Audio"))
 
     if audio_input_type == "Upload Audio":
         # Upload audio option
@@ -96,16 +96,20 @@ with col2:
             st.write(f"Suggested Action: {suggestion_voice}")
             os.remove(temp_audio_path)
 
-    elif audio_input_type == "Record Audio":
-        # Record audio from microphone
-        duration = st.slider("Select duration for recording (seconds)", min_value=1, max_value=10, value=5)
-        if st.button("Record Audio"):
-            st.write(f"Recording for {duration} seconds...")
-            audio_path = "live_audio.wav"
-            audio_file = capture_audio(audio_path, duration)
-            st.audio(audio_file, format="audio/wav")
-            # Perform voice emotion detection
-            result_voice = voice_emotion_detection(audio_file)
-            suggestion_voice = suggest_action_voice(result_voice)
-            st.write(f"Detected Emotion: {result_voice.upper()}")
-            st.write(f"Suggested Action: {suggestion_voice}")
+    
+
+st.markdown("""
+    <style>
+    .footer {
+        position: fixed;
+        bottom: 10px;
+        width: 100%;
+        text-align: center;
+        color: gray;
+        font-size: 14px;
+    }
+    </style>
+    <div class="footer">
+        <p>This prototype is developed as part of the application for Postdoctoral Researcher or Senior Research Fellow in Data Science.</p>
+    </div>
+    """, unsafe_allow_html=True)
