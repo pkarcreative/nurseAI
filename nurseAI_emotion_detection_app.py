@@ -110,6 +110,6 @@ st.markdown("""
     }
     </style>
     <div class="footer">
-        <p>This prototype is developed as part of the application for Postdoctoral Researcher or Senior Research Fellow in Data Science.</p>
+        <p>This prototype is developed as part of the application for Postdoctoral Researcher or Senior Research Fellow in Data Science at the University of Oulu.</p>
     </div>
     """, unsafe_allow_html=True)
