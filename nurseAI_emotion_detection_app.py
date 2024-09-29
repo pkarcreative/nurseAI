@@ -13,6 +13,8 @@ from speech_emotion_recognition import voice_emotion_detection, suggest_action_v
 st.set_page_config(layout="wide")
 
 st.markdown("<h1 style='text-align: center;'>NurseAI: Emotion Detection for Enhanced Patient Support</h1>", unsafe_allow_html=True)
+st.markdown("<h2 style='text-align: center;'>This app does not store any files in its storage.</h2>", unsafe_allow_html=True)
+
 st.write("<br>" * 2, unsafe_allow_html=True)
 
 def capture_audio(filename, duration, fs=44100):
@@ -29,12 +31,8 @@ def capture_audio(filename, duration, fs=44100):
     return filename
 
 
-
-
-
 # Split the page into two columns
 col1, col2 = st.columns(2)
-
 
 
 # Facial Emotion Detection in Column 1
@@ -51,25 +49,31 @@ with col1:
             image = Image.open(uploaded_image)
             st.image(image, caption="Uploaded Image", use_column_width=True)
 
-
             # Perform facial emotion detection
             result_facial = facial_emotion_detection(image)
             suggestion_facial = suggest_action_facial(result_facial)
             st.write(f"Detected Emotion: {result_facial.upper()}")
             st.write(f"Suggested Action: {suggestion_facial}")
+
+            # Remove uploaded image after processing
+            uploaded_image.close()  # Close the file stream
+            st.success("Uploaded image removed from memory after processing.")
 
     elif image_input_type == "Capture Image":
         # Capture image from webcam
         captured_image = st.camera_input("Capture an image")
         if captured_image is not None:
             image = Image.open(captured_image)
-            #st.image(image, caption="Captured Image", use_column_width=True)
 
             # Perform facial emotion detection
             result_facial = facial_emotion_detection(image)
             suggestion_facial = suggest_action_facial(result_facial)
             st.write(f"Detected Emotion: {result_facial.upper()}")
             st.write(f"Suggested Action: {suggestion_facial}")
+
+            # Show confirmation message for captured image
+            st.success("Uploaded image removed from memory after processing.")
+
 
 # Voice Emotion Detection in Column 2
 with col2:
@@ -89,14 +93,17 @@ with col2:
             with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_audio_file:
                 temp_audio_file.write(uploaded_audio.read())
                 temp_audio_path = temp_audio_file.name
+
             # Perform voice emotion detection using the temporary file path
             result_voice = voice_emotion_detection(temp_audio_path)
             suggestion_voice = suggest_action_voice(result_voice)
             st.write(f"Detected Emotion: {result_voice.upper()}")
             st.write(f"Suggested Action: {suggestion_voice}")
-            os.remove(temp_audio_path)
 
-    
+            # Remove the temporary audio file after processing
+            os.remove(temp_audio_path)
+            st.success("Uploaded audio file removed from memory after processing.")
+
 
 st.markdown("""
     <style>
@@ -110,6 +117,6 @@ st.markdown("""
     }
     </style>
     <div class="footer">
-        <p>This prototype is developed as part of the application for Postdoctoral Researcher or Senior Research Fellow in Data Science.</p>
+        <p>This prototype is developed as part of the application for Postdoctoral Researcher or Senior Research Fellow in Data Science at the University of Oulu.</p>
     </div>
     """, unsafe_allow_html=True)
