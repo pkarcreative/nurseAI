@@ -1,8 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
-# More info on Python, GitHub Actions, and Azure App Service: https://aka.ms/python-webapps-actions
 
-name: Build and deploy Python app to Azure Web App - nurseAI
+name: Build and deploy container app to Azure Web App - nurseai
 
 on:
   push:
@@ -12,67 +11,41 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: 'ubuntu-latest'
 
     steps:
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v2
 
-      - name: Set up Python version
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
 
-      - name: Create and start virtual environment
-        run: |
-          python -m venv venv
-          source venv/bin/activate
-      
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-        
-      # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
+    - name: Log in to registry
+      uses: docker/login-action@v2
+      with:
+        registry: https://streamlitrg.azurecr.io/
+        username: ${{ secrets.AzureAppService_ContainerUsername_7a55a781b30d409388e70d2b7d6afce4 }}
+        password: ${{ secrets.AzureAppService_ContainerPassword_8111070ce16644e480f9b1eaeea3f438 }}
 
-      - name: Zip artifact for deployment
-        run: zip release.zip ./* -r
-
-      - name: Upload artifact for deployment jobs
-        uses: actions/upload-artifact@v4
-        with:
-          name: python-app
-          path: |
-            release.zip
-            !venv/
+    - name: Build and push container image to registry
+      uses: docker/build-push-action@v3
+      with:
+        push: true
+        tags: streamlitrg.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_7a55a781b30d409388e70d2b7d6afce4 }}/nurseai:${{ github.sha }}
+        file: ./Dockerfile
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
     environment:
-      name: 'Production'
+      name: 'production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-    permissions:
-      id-token: write #This is required for requesting the JWT
 
     steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v4
-        with:
-          name: python-app
-
-      - name: Unzip artifact for deployment
-        run: unzip release.zip
-
-      
-      - name: Login to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_6D285F8682344CFDA4600A21B06F7E36 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_12863BFA8AEE44DBA2DC512DEABB8B65 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_0F360AF18BF848E2A72A34B1417DAF17 }}
-
-      - name: 'Deploy to Azure Web App'
-        uses: azure/webapps-deploy@v3
-        id: deploy-to-webapp
-        with:
-          app-name: 'nurseAI'
-          slot-name: 'Production'
-          
+    - name: Deploy to Azure Web App
+      id: deploy-to-webapp
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: 'nurseai'
+        slot-name: 'production'
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_e11f5f6f4e5d4fc29409873cd8c75214 }}
+        images: 'streamlitrg.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_7a55a781b30d409388e70d2b7d6afce4 }}/nurseai:${{ github.sha }}'
